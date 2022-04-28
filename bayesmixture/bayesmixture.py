@@ -805,7 +805,7 @@ class mixnorm1d :
         logProb_post_postsamp=np.zeros(M)
         if M==L:
              for t in range(M):
-                 print(t)
+                 #print(t)
                  for i in range(M0):
                      for s in permut:
                          #print(t)
@@ -823,7 +823,7 @@ class mixnorm1d :
         BS=[]
         BS.append(0)
         BS.append(-np.log(L)+logsumexp(logProb_post_qsamp-logProb_q_qsamp))
-        print(BS)
+        #print(BS)
         
         while np.abs(BS[-1]-BS[-2])>0.01:
             numerator=np.zeros(L)
@@ -834,7 +834,7 @@ class mixnorm1d :
                     numerator[t]=logProb_post_qsamp[t]-logsumexp(np.array([np.log(L)+logProb_q_qsamp[t],np.log(ESS)+logProb_post_qsamp[t]-BS[-1]]))
                     denominator[t]=logProb_q_postsamp[t]-logsumexp(np.array([np.log(L)+logProb_q_postsamp[t],np.log(ESS)+logProb_post_postsamp[t]-BS[-1]]))
             BS.append(-np.log(L)+logsumexp(numerator)+np.log(M)-logsumexp(denominator))
-            print(BS)
+            #print(BS)
                                                             
                                                                 
                                                                       
@@ -1188,7 +1188,7 @@ class mixnorm1d :
                         # if np.log(np.random.uniform(size=1))<temp[-1]*self.logLikelihood(eta[i],np.column_stack((mu[i],sigma2Prop)))+self.logPriorLoc(mu[i],sigma2Prop)-temp[-1]*self.logLikelihood(eta[i],np.column_stack((mu[i],sigma2[i])))-self.logPriorLoc(mu[i],sigma2[i]):
                         #     sigma2[i]=sigma2Prop
                         #     moved_sig+=1
-                print('moved_sig',moved_sig/(numParticles*numGibbsStep),'moved_mu',moved_mu/(numParticles*numGibbsStep),'moved_eta',moved_eta/(numParticles*numGibbsStep))
+                #print('moved_sig',moved_sig/(numParticles*numGibbsStep),'moved_mu',moved_mu/(numParticles*numGibbsStep),'moved_eta',moved_eta/(numParticles*numGibbsStep))
             #Find the next temperature adaptively
             llkParticles=np.zeros(numParticles)
             for j in range(numParticles):
@@ -1202,21 +1202,21 @@ class mixnorm1d :
                 
             #else do bissection algorithm
             else:
-                print('start')
+                #print('start')
                 a=temp[-1]
                 b=1
                 l=0
                 while l<maxIterBissection:
                     tempcand=(a+b)/2
-                    print(tempcand)
+                    #print(tempcand)
                     
                     wtemp=(tempcand-temp[-1])*llkParticles
                     Wtemp=wtemp-logsumexp(wtemp)
                     logESS=-logsumexp(2*Wtemp)
-                    print(np.exp(logESS))
+                    #print(np.exp(logESS))
                     #if np.abs(np.exp(logESS)-ESSThreshold*numParticles)<TOL or ((b-a)/2)<TOL:
                     if np.abs(np.exp(logESS)-ESSThreshold*numParticles)<TOL:
-                        print('true',np.exp(logESS))
+                        #print('true',np.exp(logESS))
                         break
                     else:
                         if logESS>np.log(ESSThreshold*numParticles): #need to increase the temp
@@ -1226,13 +1226,13 @@ class mixnorm1d :
                     l=l+1
                     
                 temp.append(tempcand)
-            print(temp[-1],np.exp(logESS))
+            #print(temp[-1],np.exp(logESS))
             
             #Reweight
-            print((temp[-1],temp[-2]))
+            #print((temp[-1],temp[-2]))
             w=(temp[-1]-temp[-2])*llkParticles
             Z+=-np.log(numParticles)+logsumexp(w)
-            print(Z)
+            #print(Z)
             
             #Resample
             for i in range(numParticles):
