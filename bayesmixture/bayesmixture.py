@@ -756,10 +756,61 @@ class mixnorm1d :
                 u[i]=logsumexp(logProbs)
             w[t]=np.sum(u)
         llk=-np.log(numSim)+logsumexp(w)
-        print('llk uncertainty sd', 1/np.sqrt(numSim)*np.exp(0.5*log_domain_var(w)-llk))
+        #print('llk uncertainty sd', 1/np.sqrt(numSim)*np.exp(0.5*log_domain_var(w)-llk))
         logvar=-np.log(numSim)+logsumexp(2*w) + np.log(1-np.exp((-np.log(numSim**2)+2*logsumexp(w))-(-np.log(numSim)+logsumexp(2*w))))
-        print('var', logvar)
+        #print('var', logvar)
         return llk,1/np.sqrt(numSim)*np.exp(0.5*logvar-llk)
+    
+    def SISv2(self,numSim): #clone of SIS, without returning variance estimator
+        #Likelihood estimation
+        data=self.data
+        w=np.zeros(numSim)
+        for t in range(numSim):
+            np.random.shuffle(data)
+            u=np.zeros(self.n)
+            S=np.zeros(self.n,dtype=int)
+            N=np.zeros(self.k,dtype=int)
+            mixtemp=mixnorm1d(data=data[0],k=self.k,priorDistWeight=self.priorDistWeight,priorParamWeight=self.priorParamWeight,priorDistLocScale=self.priorDistLocScale,priorParamLocScale=self.priorParamLocScale)
+            N[0]+=1
+            #print(data)
+            Ntemp=np.zeros(self.k)
+            Ntemp[0]=mixtemp.n
+            u[0]=np.log(self.k)+np.log(self.priorParamWeight[0]/(self.k*self.priorParamWeight[0]))+mixtemp.logLikelihoodAllocations(np.array([0]),Ntemp)
+            for i in range(1,self.n):
+                logProbs=np.zeros(self.k)
+                for k in range(self.k):
+                    logProbs[k]+=np.log((N[k]+self.priorParamWeight[0])/(i+self.k*self.priorParamWeight[k]))
+                    Stemp=S[:(i+1)].copy()
+                    Stemp[i]=k#pretend y is in cluster k
+                    ytemp=data[:(i+1)][Stemp==k]
+                    mixtemp=mixnorm1d(data=ytemp,k=self.k,priorDistWeight=self.priorDistWeight,priorParamWeight=self.priorParamWeight,priorDistLocScale=self.priorDistLocScale,priorParamLocScale=self.priorParamLocScale)
+                    Stemp=np.zeros(mixtemp.n,dtype=int).copy()
+                    Ntemp=np.zeros(self.k)
+                    Ntemp[0]=mixtemp.n
+                    logProbs[k]=logProbs[k]+mixtemp.logLikelihoodAllocations(Stemp,Ntemp)
+                    
+                    Stemp=S[:(i+1)].copy()
+                    Stemp[i]=self.n+1
+                    ytemp=data[:(i+1)][Stemp==k]
+                    mixtemp=mixnorm1d(data=ytemp,k=self.k,priorDistWeight=self.priorDistWeight,priorParamWeight=self.priorParamWeight,priorDistLocScale=self.priorDistLocScale,priorParamLocScale=self.priorParamLocScale)
+                    Stemp=np.zeros(mixtemp.n,dtype=int)
+                    Ntemp=np.zeros(self.k)
+                    Ntemp[0]=mixtemp.n
+                    logProbs[k]=logProbs[k]-mixtemp.logLikelihoodAllocations(Stemp,Ntemp)
+                    
+
+                sampledCluster=catDistLogProb(logProbs)
+                S[i]=sampledCluster
+                N[sampledCluster]+=1
+                
+                
+                u[i]=logsumexp(logProbs)
+            w[t]=np.sum(u)
+        llk=-np.log(numSim)+logsumexp(w)
+        #print('llk uncertainty sd', 1/np.sqrt(numSim)*np.exp(0.5*log_domain_var(w)-llk))
+        logvar=-np.log(numSim)+logsumexp(2*w) + np.log(1-np.exp((-np.log(numSim**2)+2*logsumexp(w))-(-np.log(numSim)+logsumexp(2*w))))
+        #print('var', logvar)
+        return llk
     
     def BridgeSampling(self,numIterGibbs, burnIn, M0): #Algorithm 3 from https://projecteuclid.org/journals/brazilian-journal-of-probability-and-statistics/volume-33/issue-4/Keeping-the-balanceBridge-sampling-for-marginal-likelihood-estimation-in-finite/10.1214/19-BJPS446.full
         eta_post,mu_post,sigma2_post,S_post,N_post=self.GibbsSamplerV2(numIterGibbs,burnIn)
@@ -880,7 +931,7 @@ class mixnorm1d :
         #print(logPosterior)
         #out=self.logLikelihoodAllocations(S[MAP_index],N[MAP_index])+np.log(math.factorial(self.k))+self.logPriorAllocation(S[MAP_index],N[MAP_index])-logPosterior
         out=self.logLikelihoodAllocations(S[MAP_index],N[MAP_index])+self.logEPPF(N[MAP_index])-logPosterior
-        print(out,varLog)
+        #print(out,varLog)
         return out
         
     def chibEstimatorPartitionsNotMAP(self,numIterGibbs,burnIn):
