@@ -1,2 +1,2 @@
-#Marginal likelihood for mixture models
+# Marginal likelihood for mixture models
 
