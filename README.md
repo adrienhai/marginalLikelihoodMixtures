@@ -28,3 +28,24 @@ The table below gives a correspondance between the notation used for the hyperpa
 
 [^1]:Our implementation of Bridge sampling does not allow for different values of T1 and T2
 [^2]:The number of permutations chosen at random to debias Chib's vanilla estimator
+
+
+### Dirichlet Process Mixtures
+
+The library bayesDPmixture.py gives all the functions used in order to compute the estimators of the marginal likelihood described in the article. Note that the only type of model currently supported is the normal mixture model with conjugate prior normal-inverse gamma. 
+The table below gives a correspondance between the notation used for the hyperparameters in the article, and the one used in the code.
+
+| Algorithm   | Method name                 | Article notation | Tuning parameter |
+| ----------- | ---------                   | ---------------- | ---------------- |
+| Chib        | chibEstimator2v2             | T1          |     numIterGibbs|           
+|                         |                           |  T2                |     numIterSIS            |
+|                         |                           |  burn-in                |     burnIn            |
+| RLR-SIS        | GeyerEstimator(distribution='Newton')             |      T1             |    numIter              |
+|                         |                           |  T2                |     numSimPrior            |
+|                         |                           |  burn-in                |     burnIn            |
+| RLR-Prior        | GeyerEstimator(distribution='prior')             |      T1             |    numIter              |
+|                         |                           |  T2                |     numSimPrior            |
+|                         |                           |  burn-in                |     burnIn            |
+| Harmonic Mean       | harmonicMean             |          T        |        numSim          | 
+|                         |                           |  burn-in                |     burnIn            | 
+| Arithmetic Mean        | arithmeticMean             |     T             |     numSim             |   
