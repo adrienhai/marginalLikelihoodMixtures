@@ -1037,10 +1037,10 @@ class DPmixnorm1d:
             w[t]=np.sum(u)
         llk=-np.log(numIterGibbs-burnIn)+logsumexp(w)
         logprior=ss.gamma.logpdf(MStar,a=self.priorParamM[0],scale=1/self.priorParamM[1])
-        print('llk uncertainty sd', 1/np.sqrt(numIterGibbs-burnIn)*np.sqrt(np.var(np.exp(w)))/np.mean(np.exp(w)))
-        print('log posterior', logposteriorM)
-        print('llk', llk)
-        print('logprior',logprior)
+        #print('llk uncertainty sd', 1/np.sqrt(numIterGibbs-burnIn)*np.sqrt(np.var(np.exp(w)))/np.mean(np.exp(w)))
+        #print('log posterior', logposteriorM)
+        #print('llk', llk)
+        #print('logprior',logprior)
         return llk+logprior-logposteriorM
     
     def ChibEstimator2v2(self,numIterGibbs,burnIn,numIterSIS): #possibility to choose different number of SIS and MCMC simulations
