@@ -1,4 +1,4 @@
-# Marginal likelihood for mixture models
+# Marginal likelihood estimation for mixture models
 
 ### Finite mixtures
 
