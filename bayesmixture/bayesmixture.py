@@ -1177,7 +1177,7 @@ class mixnorm1d :
         return(Z)
 
         
-    def adaptiveSMC(self,numParticles,numGibbsStep,ESSThreshold,maxIterBissection):
+    def adaptiveSMC(self,numParticles,numGibbsStep,ESSThreshold=0.8,maxIterBissection=10000):
         TOL=1
         temp=[]
         temp.append(0)
